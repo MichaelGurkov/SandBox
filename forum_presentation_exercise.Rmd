@@ -1,0 +1,116 @@
+
+
+```{r set_params}
+
+filepath_to_data = paste0(
+    file.path(Sys.getenv("USERPROFILE")),
+    "\\OneDrive - Bank Of Israel\\Data\\BoI\\GaR_Data\\Working_data\\data_fame.csv"
+  )
+
+partitions_list = list(
+  dom_macro = c(
+    "private_consumption",
+    "public_consumption",
+    "investment",
+    "unemployment"),
+  ext_macro = c(
+    "oecd_imp",
+    "exports",
+    "imports"
+  ),
+  dom_fin = c(
+    "credit",
+    "house_price",
+    "ta125_close",
+    "boi_rate"
+  ),
+  ext_fin = c(
+    "rate_euro",
+    "rate_us",
+    "sp500",
+    "eurostoxx600",
+    "oil_p",
+    "non_energy_p"
+  )
+)
+
+
+preprocess_plan = list(
+  vars_to_yoy = c(
+    "gdp",
+    "private_consumption",
+    "public_consumption",
+    "investment",
+    "oecd_imp",
+    "exports",
+    "imports",
+    "sp500",
+    "eurostoxx600",
+    "oil_p",
+    "non_energy_p",
+    "credit",
+    "house_price",
+    "ta125_close"
+  ),
+  vars_to_diff = c("unemployment",
+                   "boi_rate",
+                   "rate_euro",
+                   "rate_us")
+)
+
+
+horizons = c(1,4,8,12)
+
+quantiles = c(0.05,0.25,0.5,0.75,0.95)
+
+
+```
+
+
+```{r load_library}
+
+library(tidyverse)
+
+library(GaRPackg)
+
+```
+
+
+```{r load_data}
+
+raw_df = import_from_fame_template(filepath_to_data)
+
+df = preprocess_df(
+  df = raw_df,
+  vars_to_yoy = preprocess_plan$vars_to_yoy,
+  vars_to_diff = preprocess_plan$vars_to_diff
+)
+
+
+
+df = df %>% 
+  filter(date <= "2019 Q4")
+
+```
+
+
+```{r run_analysis}
+
+gar_analysis = run_GaR_analysis(
+  partitions_list = partitions_list,
+  vars_df = df,
+  target_var_name = "gdp",
+  horizon_list = horizons,
+  quantile_vec = quantiles)
+
+```
+
+
+```{r plot_fan_chart}
+
+plot_fan_chart(forecast_df = gar_analysis$fitted_df,
+               actual_df = select(df, c("date","gdp")))
+
+
+```
+
