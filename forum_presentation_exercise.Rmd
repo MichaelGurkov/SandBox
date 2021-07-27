@@ -76,7 +76,7 @@ library(GaRPackg)
 ```
 
 
-```{r load_data}
+```{r load_data_draft}
 
 raw_df = import_from_fame_template(filepath_to_data)
 
@@ -94,7 +94,7 @@ df = df %>%
 ```
 
 
-```{r run_analysis}
+```{r run_analysis_draft}
 
 gar_analysis = run_GaR_analysis(
   partitions_list = partitions_list,
@@ -106,7 +106,7 @@ gar_analysis = run_GaR_analysis(
 ```
 
 
-```{r plot_fan_chart}
+```{r plot_fan_chart_draft}
 
 plot_fan_chart(forecast_df = gar_analysis$fitted_df,
                actual_df = select(df, c("date","gdp")))
